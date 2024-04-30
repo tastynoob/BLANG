@@ -1,0 +1,7 @@
+def fibo(n) {
+    if (n == 0) ret 0
+    if (n == 1) ret 1
+    ret fibo(n-1) + fibo(n-2)
+}
+a = fibo(10)
+print(a)

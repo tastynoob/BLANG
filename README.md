@@ -6,3 +6,8 @@ you need to install ply package
 ```sh
 apt install python3-ply
 ```
+
+run a simple test
+```
+python3 blang.py test.blang
+```

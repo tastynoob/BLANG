@@ -7,6 +7,9 @@
 	"settings": {
 		"black-formatter.args": [
 			"--skip-string-normalization"
-		]
+		],
+		"files.watcherExclude": {
+			"**/target": true
+		}
 	}
 }

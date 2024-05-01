@@ -1,0 +1,19 @@
+def fibo(n) {
+    if (n == 0) ret 0
+    if (n == 1) ret 1
+    ret fibo(n-1) + fibo(n-2)
+}
+
+def waitNext() {
+    print "Press Enter to continue..."
+    input()
+}
+
+while (1>0) {
+    print "Enter a number: "
+    # a : float = 0
+    # a = fibo float input()
+    a := fibo float input()
+    print a
+    waitNext()
+}

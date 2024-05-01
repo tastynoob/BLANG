@@ -7,7 +7,12 @@ you need to install ply package
 apt install python3-ply
 ```
 
-run a simple test
+interpret and run a blang file 
 ```
-python3 blang.py test.blang
+python3 blang.py example/fibo.blang
+```
+
+dump AST tree
+```
+python3 blang.py example/fibo.blang -d
 ```

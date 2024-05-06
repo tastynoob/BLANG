@@ -21,6 +21,7 @@ tokens = keywords + (
     'OPERLV0',  # */
     'OPERLV1',  # +-
     'OPERLV2',  # > < >= <= == !=
+    'OPERLV3',  # && ||
     'ASSIGN',  # =
     'LPAREN',  # (
     'RPAREN',  # )
@@ -35,8 +36,6 @@ tokens = keywords + (
 
 t_COLON = r':'
 t_ASSIGN = r'='
-t_LSQUARE = r'\['
-t_RSQUARE = r'\]'
 t_COMMA = r','
 t_ignore = ' \t'
 
@@ -97,6 +96,12 @@ def t_OPERLV2(t):
     return t
 
 
+def t_OPERLV3(t):
+    r'&&|\|\|'
+    set_last_token(t.lexer, 'oper')
+    return t
+
+
 def t_LPAREN(t):
     r'\('
     t.lexer.paren_level += 1
@@ -106,6 +111,16 @@ def t_LPAREN(t):
 def t_RPAREN(t):
     r'\)'
     t.lexer.paren_level -= 1
+    return t
+
+
+def t_LSQUARE(t):
+    r'\['
+    return t
+
+
+def t_RSQUARE(t):
+    r'\]'
     return t
 
 

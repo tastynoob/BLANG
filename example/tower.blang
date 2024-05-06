@@ -1,6 +1,7 @@
-print "Enter a number: "
+# print "Enter a number: "
 
-a := int input()
+# a := int input()
+a := 10
 row := 0
 while (row < a) {
     spaceCnt := a - row

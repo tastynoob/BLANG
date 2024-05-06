@@ -3,14 +3,17 @@ from abc import ABC
 import json
 
 
-class AstNode:
+class AstNode(ABC):
     type = None
 
     def __str__(self):
-        return f'{self.type}'
+        raise NotImplementedError("should not be called")
 
-    def replace(self, node):
-        self = node
+    def to_json(self):
+        raise NotImplementedError("should not be called")
+
+    def getChild(self):
+        return []
 
 
 class AstProgram(AstNode):
@@ -25,6 +28,9 @@ class AstProgram(AstNode):
 
     def to_json(self):
         return json.dumps({'type': self.type, 'body': self.body.to_json()}, indent=4)
+
+    def getChild(self):
+        return [self.body]
 
 
 class AstStatList(AstNode):
@@ -50,6 +56,9 @@ class AstStatList(AstNode):
     def to_json(self):
         return {'type': self.type, 'body': [x.to_json() for x in self.body]}
 
+    def getChild(self):
+        return self.body
+
 
 class AstParamsList(AstNode):
     type = 'ParamsList'
@@ -64,10 +73,10 @@ class AstParamsList(AstNode):
             self.params.append(next)
 
     def __str__(self):
-        raise NotImplementedError
+        raise NotImplementedError("should not be called")
 
     def to_json(self):
-        raise NotImplementedError
+        raise NotImplementedError("should not be called")
 
 
 class AstFuncDecl(AstNode):
@@ -103,19 +112,31 @@ class AstFuncDecl(AstNode):
                 'body': self.body.to_json(),
             }
 
+    def getChild(self):
+        return [self.body]
+
 
 class AstRet(AstNode):
     type = 'Ret'
     expr = None
 
-    def __init__(self, expr):
+    def __init__(self, expr=None):
         self.expr = expr
 
     def __str__(self):
         return f'{self.type}({self.expr})'
 
     def to_json(self):
-        return {'type': self.type, 'expr': self.expr.to_json()}
+        if self.expr:
+            return {'type': self.type, 'expr': self.expr.to_json()}
+        else:
+            return {'type': self.type, 'expr': 'none'}
+
+    def getChild(self):
+        if self.expr:
+            return [self.expr]
+        else:
+            return []
 
 
 class AstVarDecl(AstNode):
@@ -148,6 +169,9 @@ class AstVarDecl(AstNode):
                 'expr': self.expr.to_json(),
             }
 
+    def getChild(self):
+        return [self.expr]
+
 
 class AstCallParamsList(AstNode):
     type = 'CallParamsList'
@@ -162,10 +186,10 @@ class AstCallParamsList(AstNode):
             self.params.append(next)
 
     def __str__(self):
-        raise NotImplementedError
+        raise NotImplementedError("should not be called")
 
     def to_json(self):
-        raise NotImplementedError
+        raise NotImplementedError("should not be called")
 
 
 class AstFuncCall(AstNode):
@@ -194,6 +218,9 @@ class AstFuncCall(AstNode):
             }
         else:
             return {'type': self.type, 'name': self.name}
+
+    def getChild(self):
+        return self.params
 
 
 class AstField(AstNode):
@@ -239,6 +266,12 @@ class AstIf(AstNode):
                 'then': self.then.to_json(),
             }
 
+    def getChild(self):
+        if self.else_:
+            return [self.condition, self.then, self.else_]
+        else:
+            return [self.condition, self.then]
+
 
 class AstWhile(AstNode):
     type = 'While'
@@ -259,24 +292,50 @@ class AstWhile(AstNode):
             'body': self.body.to_json(),
         }
 
+    def getChild(self):
+        return [self.condition, self.body]
+
 
 class AstAssign(AstNode):
     type = 'Assign'
-    field = None
+    lvalue = None
     expr = None
 
-    def __init__(self, field, expr):
-        self.field = field
+    def __init__(self, lvalue, expr):
+        self.lvalue = lvalue
         self.expr = expr
 
     def __str__(self):
-        return f'{self.type}({self.field}, {self.expr})'
+        return f'{self.type}({self.lvalue}, {self.expr})'
 
     def to_json(self):
         return {
             'type': self.type,
-            'field': self.field.to_json(),
+            'lvalue': self.lvalue.to_json(),
             'expr': self.expr.to_json(),
+        }
+
+    def getChild(self):
+        return [self.field, self.expr]
+
+
+class AstIndex(AstNode):
+    type = 'Index'
+    point = None
+    index = None
+
+    def __init__(self, point, index):
+        self.point = point
+        self.index = index
+
+    def __str__(self):
+        return f'{self.type}({self.point}, {self.index})'
+
+    def to_json(self):
+        return {
+            'type': self.type,
+            'point': self.point.to_json(),
+            'index': self.index.to_json(),
         }
 
 
@@ -298,6 +357,10 @@ class AstUnaryOper(AstNode):
             'operator': self.operator,
             'expr': self.expr.to_json(),
         }
+
+    def getChild(self):
+        return [self.expr]
+
 
 class AstBinaryOper(AstNode):
     type = 'BinaryOper'
@@ -321,6 +384,9 @@ class AstBinaryOper(AstNode):
             'right': self.right.to_json(),
         }
 
+    def getChild(self):
+        return [self.left, self.right]
+
 
 class AstConst(AstNode):
     type = 'Const'
@@ -339,9 +405,3 @@ class AstConst(AstNode):
 
 class AstEnd(AstNode):
     type = 'End'
-
-    def __str__(self):
-        raise SyntaxError
-
-    def to_json(self):
-        raise SyntaxError

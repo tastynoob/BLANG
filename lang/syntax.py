@@ -65,8 +65,12 @@ def p_func_decl(p):
 
 
 def p_stat_ret(p):
-    """stat_ret : RET stat_expr"""
-    p[0] = ast.AstRet(p[2])
+    """stat_ret : RET stat_expr
+    | RET END"""
+    if type(p[2]) == ast.AstEnd:
+        p[0] = ast.AstRet()
+    else:
+        p[0] = ast.AstRet(p[2])
 
 
 def p_var_decl(p):
@@ -120,33 +124,48 @@ def p_stat_expr(p):
     p[0] = p[1]
 
 
-def p_expr_oper(p):
-    """expr : FIELD ASSIGN expr
-    | expr OPERLV2 expr
-    | expr OPERLV1 expr
-    | expr OPERLV0 expr
-    | LPAREN expr RPAREN
+def p_expr(p):
+    """expr : expr ASSIGN expr
+    | expr_binary
     | expr_unary
+    | expr_bracket
+    | expr_index
     | single_value"""
-    if p[1] == "(":
-        p[0] = p[2]
-    elif len(p) == 4:
-        if p[2] == "=":
-            p[0] = ast.AstAssign(p[1], p[3])
-        else:
-            p[0] = ast.AstBinaryOper(p[2], p[1], p[3])
+    if len(p) == 4:
+        p[0] = ast.AstAssign(p[1], p[3])
     else:
         p[0] = p[1]
 
-def p_expr_unary(p):
+
+def p_expr_binaryOper(p):
+    """expr_binary : expr OPERLV3 expr
+    | expr OPERLV2 expr
+    | expr OPERLV1 expr
+    | expr OPERLV0 expr"""
+    p[0] = ast.AstBinaryOper(p[2], p[1], p[3])
+
+
+def p_expr_unaryOper(p):
     """expr_unary : UNARY expr %prec UNARY
     | OPERLV1 expr %prec UNARY"""
     p[0] = ast.AstUnaryOper(p[1], p[2])
 
+
+def p_expr_bracket(p):
+    """expr_bracket : LPAREN expr RPAREN"""
+    p[0] = p[2]
+
+
+def p_expr_index(p):
+    """expr_index : FIELD LSQUARE expr RSQUARE"""
+    p[0] = ast.AstIndex(p[1], p[3])
+
+
 def p_single_value(p):
     """single_value : CONST
     | FIELD
-    | func_call"""
+    | func_call
+    | expr_index"""
     p[0] = p[1]
 
 
@@ -161,13 +180,14 @@ precedence = (
     ("nonassoc", "LOWER_THAN_ELSE"),
     ("nonassoc", "ELSE"),
     ("left", "ASSIGN"),
+    ("left", "OPERLV3"),
     ("left", "OPERLV2"),
     ("left", "OPERLV1"),
     ("left", "OPERLV0"),
     ("left", "LPAREN", "RPAREN"),
     ("left", "LCURLY", "RCURLY"),
     ("left", "COMMA"),
-    ("right", "UNARY")
+    ("right", "UNARY"),
 )
 
 

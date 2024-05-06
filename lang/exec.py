@@ -4,14 +4,17 @@ import lang.typeclass as tc
 import time
 import os
 
+
 def print_(val):
     if type(val) == tc.TypeString:
         val = val.replace('\\n', '\n')
     print(val, end='')
 
+
 def println_(val):
     print_(val)
     print()
+
 
 def cls():
     os.system('clear')
@@ -28,6 +31,13 @@ def int_(val):
 def time_():
     return tc.TypeInt(time.time_ns())
 
+
+def list_(x: tc.TypeString):
+    # x: "1,2,3,4,5"
+    x = x.split(',')
+    return [int(i) for i in x]
+
+
 build_in_func = {
     'print': print_,
     'println': println_,
@@ -35,7 +45,8 @@ build_in_func = {
     'float': float_,
     'int': int_,
     'cls': cls,
-    'time': time_
+    'time': time_,
+    'list': list_,
 }
 
 
@@ -49,13 +60,6 @@ class Interpreter(vis.NodeVisitor):
         self.varlist = {}
         self.funclist = build_in_func
         pass
-
-    def visit_AstProgram(self, node: ast.AstProgram):
-        self.visit(node.body)
-
-    def visit_AstStatList(self, node: ast.AstStatList):
-        for i in range(len(node.body)):
-            self.visit(node.body[i])
 
     def visit_AstIf(self, node: ast.AstIf):
         if self.visit(node.condition):
@@ -82,11 +86,18 @@ class Interpreter(vis.NodeVisitor):
             self.varlist[node.varname] = var
 
     def visit_AstAssign(self, node: ast.AstAssign):
-        if self.varlist.get(node.field.name) is not None:
-            rvalue = self.visit(node.expr)
-            self.varlist[node.field.name] = rvalue
+        rvalue = self.visit(node.expr)
+        if type(node.lvalue) == ast.AstField:
+            if self.varlist.get(node.lvalue.name) is not None:
+                self.varlist[node.lvalue.name] = rvalue
+            else:
+                raise SyntaxError(f"Variable '{node.lvalue.name}' not found")
+        elif type(node.lvalue) == ast.AstIndex:
+            arr = self.varlist.get(node.lvalue.point.name)
+            index = self.visit(node.lvalue.index)
+            arr[index] = rvalue
         else:
-            raise SyntaxError(f"Variable '{node.field.name}' not found")
+            raise SyntaxError(f"Unsupport lvalue type {type(node.lvalue)}")
         return rvalue
 
     def visit_AstUnaryOper(self, node: ast.AstUnaryOper):
@@ -101,7 +112,6 @@ class Interpreter(vis.NodeVisitor):
             return ~expr
         else:
             raise SyntaxError(f"Unknown operator {node.operator}")
-
 
     def visit_AstBinaryOper(self, node: ast.AstBinaryOper):
         left = self.visit(node.left)
@@ -128,11 +138,20 @@ class Interpreter(vis.NodeVisitor):
             return left == right
         elif node.operator == '!=':
             return left != right
+        elif node.operator == '&&':
+            return left and right
+        elif node.operator == '||':
+            return left or right
         else:
             raise Exception(f"Unknown operator {node.operator}")
 
     def visit_AstConst(self, node: ast.AstConst):
         return node.value
+
+    def visit_AstIndex(self, node: ast.AstIndex):
+        point = self.visit(node.point)
+        index = self.visit(node.index)
+        return point[index]
 
     def visit_AstField(self, node: ast.AstField):
         field = node.name
@@ -181,5 +200,8 @@ class FuncExecutor(Interpreter):
                 return
 
     def visit_AstRet(self, node: ast.AstRet):
-        self.retVal = self.visit(node.expr)
+        if node.expr:
+            self.retVal = self.visit(node.expr)
+        else:
+            self.retVal = None
         self.retFlag = True

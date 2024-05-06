@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import lang
-import lang.token
+import lang.syntax
 import lang.visitor
 import lang.exec as exec
 import argparse as ap
@@ -20,7 +20,7 @@ if args.file:
 else:
     exit()
 
-asttree = lang.token.parser.parse(code)
+asttree = lang.syntax.parser.parse(code)
 if args.dump_json:
     open('astTree.json', 'w').write(asttree.to_json())
 
@@ -36,4 +36,3 @@ interpreter = exec.Interpreter()
 interpreter.visit(asttree)
 if args.dump_json:
     open('astTreeExecuted.json', 'w').write(asttree.to_json())
-

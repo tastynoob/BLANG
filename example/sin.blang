@@ -31,4 +31,4 @@ def sin(x) {
     ret result
 }
 
-println sin(3.14159265358979323846 / 3)
+println sin(3.14159265358979323846 / 2)

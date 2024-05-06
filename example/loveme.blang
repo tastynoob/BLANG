@@ -1,6 +1,6 @@
 def IF(a) {
     if (a) {
-        print "love you too!"
+        println "love you too!"
     }
 }
 

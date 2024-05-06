@@ -10,6 +10,9 @@ class NodeVisitor(ABC):
         return node
 
     def generic_visit(self, node):
+        child = node.getChild()
+        for i in range(len(child)):
+            self.visit(child[i])
         return node
 
 
@@ -76,7 +79,8 @@ class Optimizer(NodeVisitor):
         return node
 
     def visit_AstRet(self, node: ast.AstRet):
-        node.expr = self.visit(node.expr)
+        if node.expr:
+            node.expr = self.visit(node.expr)
         return node
 
     def visit_AstFuncCall(self, node: ast.AstFuncCall):

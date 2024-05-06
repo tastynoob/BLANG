@@ -12,6 +12,7 @@ def waitNext() {
 print "Enter a number: "
 # a : int = 0;
 # a = fibo int input(); 
-a := fibo int input()
+# a := fibo int input()
+a := 10
 println a
-waitNext()
+#waitNext()

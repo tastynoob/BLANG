@@ -84,7 +84,7 @@ def p_stat_if(p):
     if len(p) == 6:
         p[0] = ast.AstIf(p[3], p[5])
     else:
-        p[0] = ast.AstIf(p[3], p[5], p[6])
+        p[0] = ast.AstIf(p[3], p[5], p[7])
 
 
 def p_stat_loops(p):
@@ -126,6 +126,7 @@ def p_expr_oper(p):
     | expr OPERLV1 expr
     | expr OPERLV0 expr
     | LPAREN expr RPAREN
+    | expr_unary
     | single_value"""
     if p[1] == "(":
         p[0] = p[2]
@@ -137,6 +138,10 @@ def p_expr_oper(p):
     else:
         p[0] = p[1]
 
+def p_expr_unary(p):
+    """expr_unary : UNARY expr %prec UNARY
+    | OPERLV1 expr %prec UNARY"""
+    p[0] = ast.AstUnaryOper(p[1], p[2])
 
 def p_single_value(p):
     """single_value : CONST
@@ -162,7 +167,8 @@ precedence = (
     ("left", "LPAREN", "RPAREN"),
     ("left", "LCURLY", "RCURLY"),
     ("left", "COMMA"),
+    ("right", "UNARY")
 )
 
 
-parser = yacc.yacc(outputdir="generated")
+parser = yacc.yacc(optimize=True, outputdir="generated", debug=False)

@@ -72,7 +72,7 @@ class Optimizer(NodeVisitor):
             elif node.operator == '!=':
                 node = ast.AstConst(node.left.value != node.right.value)
             else:
-                raise Exception(f"Unknown operator {node.operator}")
+                return node
         return node
 
     def visit_AstRet(self, node: ast.AstRet):

@@ -1,0 +1,34 @@
+def pow(x, n) {
+    if (n==0) 
+        ret 1
+    result := x
+    i := n
+    while (i = i - 1)
+        result = result * x
+    ret result
+}
+
+
+def factorial(n) {
+    if (n == 0)
+        ret 1
+    else
+        ret n * factorial(n - 1)
+}
+
+
+# sin taylor series
+def sin(x) {
+    x = x % (2.0 * 3.14159265358979323846)
+    result := 0.0
+    i := 0
+    while (i < 20) {
+        a := float pow(-1, i) * float pow(x, 2 * i + 1)
+        b : float = factorial(2 * i + 1)
+        result = result + a / b
+        i = i + 1
+    }
+    ret result
+}
+
+println sin(3.14159265358979323846 / 3)

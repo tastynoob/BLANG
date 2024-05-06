@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import lang
 import lang.token
 import lang.visitor
@@ -29,7 +30,10 @@ asttree = optimizer.visit(asttree)
 if args.dump_json:
     open('astTreeOptimized.json', 'w').write(asttree.to_json())
 
-
 # run the interpreter
 interpreter = exec.Interpreter()
+
 interpreter.visit(asttree)
+if args.dump_json:
+    open('astTreeExecuted.json', 'w').write(asttree.to_json())
+

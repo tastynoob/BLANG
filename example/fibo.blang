@@ -5,15 +5,13 @@ def fibo(n) {
 }
 
 def waitNext() {
-    print "Press Enter to continue..."
+    println "Press Enter to continue..."
     input()
 }
 
-while (1>0) {
-    print "Enter a number: "
-    # a : float = 0
-    # a = fibo float input()
-    a := fibo float input()
-    print a
-    waitNext()
-}
+print "Enter a number: "
+# a : int = 0;
+# a = fibo int input(); 
+a := fibo int input()
+println a
+waitNext()

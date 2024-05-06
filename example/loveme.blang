@@ -1,0 +1,20 @@
+def IF(a) {
+    if (a) {
+        print "love you too!"
+    }
+}
+
+def love(a) {
+    if (a == "love") {
+        ret true
+    }
+}
+
+def me() {
+    ret "love"
+}
+
+
+IF love me()
+
+

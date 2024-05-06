@@ -17,6 +17,7 @@ for keyword in keywords:
 tokens = keywords + (
     'CONST',
     'FIELD',  # a, b, c, d ...
+    'UNARY',  # ! ~ (include OPERLV1)
     'OPERLV0',  # */
     'OPERLV1',  # +-
     'OPERLV2',  # > < >= <= == !=
@@ -40,18 +41,59 @@ t_COMMA = r','
 t_ignore = ' \t'
 
 
+def t_NumFloat(t):
+    r'\d+\.\d+'
+    set_last_token(t.lexer, 'const')
+    t.type = 'CONST'
+    t.value = ast.AstConst(tc.TypeFloat(t.value))
+    return t
+
+
+def t_NumInt(t):
+    r'\d+'
+    set_last_token(t.lexer, 'const')
+    t.type = 'CONST'
+    t.value = ast.AstConst(tc.TypeInt(t.value))
+    return t
+
+
+def t_STRING(t):
+    r'"[^"]*"'
+    set_last_token(t.lexer, 'const')
+    t.type = 'CONST'
+    t.value = ast.AstConst(tc.TypeString(t.value[1:-1]))
+    return t
+
+
+def t_Boolean(t):
+    r'true|false'
+    set_last_token(t.lexer, 'const')
+    t.type = 'CONST'
+    t.value = ast.AstConst(tc.TypeBool(t.value))
+    return t
+
+
+def t_UNARY(t):
+    r'!|~'
+    set_last_token(t.lexer, 'oper')
+    return t
+
+
 def t_OPERLV0(t):
-    r'\*|/'
+    r'\*|/|%'
+    set_last_token(t.lexer, 'oper')
     return t
 
 
 def t_OPERLV1(t):
     r'\+|-'
+    set_last_token(t.lexer, 'oper')
     return t
 
 
 def t_OPERLV2(t):
-    r'>|<|>=|<=|==|!='
+    r'>=|<=|==|!=|>|<'
+    set_last_token(t.lexer, 'oper')
     return t
 
 
@@ -69,44 +111,19 @@ def t_RPAREN(t):
 
 def t_LCURLY(t):
     r'\{'
+    set_last_token(t.lexer, 'lcurly')
     return t
 
 
 def t_RCURLY(t):
     r'\}'
-    return t
-
-
-def t_NumFloat(t):
-    r'\d+\.\d+'
-    t.type = 'CONST'
-    t.value = ast.AstConst(tc.TypeFloat(t.value))
-    return t
-
-
-def t_NumInt(t):
-    r'\d+'
-    t.type = 'CONST'
-    t.value = ast.AstConst(tc.TypeInt(t.value))
-    return t
-
-
-def t_STRING(t):
-    r'"[^"]*"'
-    t.type = 'CONST'
-    t.value = ast.AstConst(tc.TypeString(t.value[1:-1]))
-    return t
-
-
-def t_Boolean(t):
-    r'true|false'
-    t.type = 'CONST'
-    t.value = ast.AstConst(tc.TypeBool(t.value))
+    set_last_token(t.lexer, 'rcurly')
     return t
 
 
 def t_FIELD(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
+    set_last_token(t.lexer, t.value)
     if t.value in keywords_map:
         t.type = keywords_map[t.value]
     else:
@@ -119,6 +136,12 @@ def t_NEWLINE(t):
     t.lexer.lineno += t.value.count('\n')
     # ignore newline if we are in a paren
     if t.lexer.paren_level != 0:
+        return
+    if t.lexer.last_token == 'if':
+        return
+    if t.lexer.last_token == 'while':
+        return
+    if t.lexer.last_token == 'else':
         return
     t.type = 'END'
     t.value = ast.AstEnd()
@@ -142,5 +165,12 @@ def t_error(t):
     raise SyntaxError
 
 
-lexer = lex.lex()
+def set_last_token(lexer, name):
+    # only record the last token if we are not in a paren
+    if lexer.paren_level == 0:
+        lexer.last_token = name
+
+
+lexer = lex.lex(optimize=True, outputdir='generated')
 lexer.paren_level = 0
+lexer.last_token = None

@@ -1,0 +1,18 @@
+print "Enter a number: "
+
+a := int input()
+row := 0
+while (row < a) {
+    spaceCnt := a - row
+    while (spaceCnt > 0) {
+        spaceCnt = spaceCnt - 1
+        print " "
+    }
+    starCnt := row * 2 + 1
+    while (starCnt > 0) {
+        starCnt = starCnt - 1
+        print "*"
+    }
+    print "\n"
+    row = row + 1
+}

@@ -9,11 +9,11 @@ class TypeInt(int):
     def __sub__(self, value: int):
         return TypeInt(super().__sub__(value))
 
-    def __mul__(self, value: int):
-        return TypeInt(super().__mul__(value))
+    def __mul__(self, value):
+        return TypeInt(super().__mul__(int(value)))
 
     def __truediv__(self, value: int):
-        return TypeInt(super().__truediv__(value))
+        return TypeInt(super().__truediv__(int(value)))
 
     def __floordiv__(self, value: int):
         return TypeInt(super().__floordiv__(value))
@@ -70,16 +70,35 @@ class TypeInt(int):
         return TypeBool(super().__ge__(value))
 
     def to_json(self):
-        return {'varType': 'int', 'value': super().__str__()}
+        return {'type': 'typeClass', 'varType': 'int', 'value': super().__str__()}
 
 
 class TypeFloat(float):
-    pass
+    def __add__(self, value: float) -> float:
+        return TypeFloat(super().__add__(value))
+
+    def __sub__(self, value: float) -> float:
+        return TypeFloat(super().__sub__(value))
+
+    def __mul__(self, value: float) -> float:
+        return TypeFloat(super().__mul__(value))
+
+    def __truediv__(self, value: float) -> float:
+        return TypeFloat(super().__truediv__(value))
+
+    def __floordiv__(self, value: float) -> float:
+        return TypeFloat(super().__floordiv__(value))
+
+    def __mod__(self, value: float) -> float:
+        return TypeFloat(super().__mod__(value))
+
+    def to_json(self):
+        return {'type': 'typeClass', 'varType': 'float', 'value': super().__str__()}
 
 
 class TypeString(str):
     def to_json(self):
-        return {'varType': 'string', 'value': super().__str__()}
+        return {'type': 'typeClass', 'varType': 'string', 'value': super().__str__()}
 
 
 class TypeBool:

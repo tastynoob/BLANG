@@ -280,6 +280,25 @@ class AstAssign(AstNode):
         }
 
 
+class AstUnaryOper(AstNode):
+    type = 'UnaryOper'
+    operator = None
+    expr = None
+
+    def __init__(self, operator, expr):
+        self.operator = operator
+        self.expr = expr
+
+    def __str__(self):
+        return f'{self.type}({self.operator}, {self.expr})'
+
+    def to_json(self):
+        return {
+            'type': self.type,
+            'operator': self.operator,
+            'expr': self.expr.to_json(),
+        }
+
 class AstBinaryOper(AstNode):
     type = 'BinaryOper'
     operator = None

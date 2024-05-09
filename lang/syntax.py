@@ -33,7 +33,8 @@ def p_stat(p):
     | stat_if
     | stat_loops
     | stat_compound
-    | func_decl"""
+    | func_decl
+    | class_decl"""
     p[0] = p[1]
 
 
@@ -44,6 +45,17 @@ def p_stat_compound(p):
         p[0] = ast.AstNode()
     else:
         p[0] = p[2]
+
+
+def p_class_decl(p):
+    """class_decl : CLASS FIELD stat_compound"""
+    p[0] = ast.AstClassDecl(p[2].name, p[3])
+
+
+def p_mbr_sel(p):
+    """mbr_sel : FIELD DOT FIELD
+    | FIELD DOT func_call"""
+    p[0] = ast.AstMbrSel(p[1], p[3])
 
 
 def p_params_list(p):
@@ -165,6 +177,7 @@ def p_single_value(p):
     """single_value : CONST
     | FIELD
     | func_call
+    | mbr_sel
     | expr_index"""
     p[0] = p[1]
 

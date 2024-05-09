@@ -15,7 +15,7 @@ def qsort(arr, len) {
             arr[pivotIndex] = arr[start]
             arr[start] = temp
 
-            i := start
+            i = start
             j := end
             while (i < pivotIndex && j > pivotIndex) {
                 while (arr[i] <= pivot) i=i+1
@@ -40,7 +40,7 @@ def qsort(arr, len) {
     qsort_(arr, 0, len-1)
 }
 
-arr := list "10, 9, 8, 7, 6, 5, 4, 3, 2, 1"
+arr := list "10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9"
 println arr
-qsort(arr, 10)
+qsort(arr, 20)
 println arr

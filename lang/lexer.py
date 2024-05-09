@@ -8,6 +8,7 @@ keywords = (
     'ELSE',
     'DEF',
     'RET',
+    'CLASS',
 )
 
 keywords_map = {}
@@ -30,6 +31,7 @@ tokens = keywords + (
     'LCURLY',  # {
     'RCURLY',  # }
     'COMMA',  # ,
+    'DOT',  # .
     'COLON',
     'END',
 )
@@ -69,6 +71,11 @@ def t_Boolean(t):
     set_last_token(t.lexer, 'const')
     t.type = 'CONST'
     t.value = ast.AstConst(tc.TypeBool(t.value))
+    return t
+
+
+def t_DOT(t):
+    r'\.'
     return t
 
 
@@ -132,7 +139,15 @@ def t_LCURLY(t):
 
 def t_RCURLY(t):
     r'\}'
-    set_last_token(t.lexer, 'rcurly')
+    # add a fake token to indicate the end of the block
+    if t.lexer.rcurly_end:
+        t.lexer.rcurly_end = False
+        set_last_token(t.lexer, 'rcurly')
+    else:
+        t.lexer.rcurly_end = True
+        t.type = 'END'
+        t.value = ast.AstEnd()
+        t.lexer.lexpos -= 1
     return t
 
 
@@ -189,3 +204,4 @@ def set_last_token(lexer, name):
 lexer = lex.lex(optimize=True, outputdir='generated')
 lexer.paren_level = 0
 lexer.last_token = None
+lexer.rcurly_end = False

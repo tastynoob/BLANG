@@ -17,24 +17,24 @@ class AstNode(ABC):
 
 
 class AstProgram(AstNode):
-    type = 'Program'
+    type = "Program"
     body = None
 
     def __init__(self, body):
         self.body = body
 
     def __str__(self):
-        return f'{self.type}({self.body})'
+        return f"{self.type}({self.body})"
 
     def to_json(self):
-        return json.dumps({'type': self.type, 'body': self.body.to_json()}, indent=4)
+        return json.dumps({"type": self.type, "body": self.body.to_json()}, indent=4)
 
     def getChild(self):
         return [self.body]
 
 
 class AstStatList(AstNode):
-    type = 'StatList'
+    type = "StatList"
     body = []
 
     def __init__(self, body=None, next=None):
@@ -51,17 +51,56 @@ class AstStatList(AstNode):
                 self.body.append(next)
 
     def __str__(self):
-        return f'{self.type}({[str(x) for x in self.body]})'
+        return f"{self.type}({[str(x) for x in self.body]})"
 
     def to_json(self):
-        return {'type': self.type, 'body': [x.to_json() for x in self.body]}
+        return {"type": self.type, "body": [x.to_json() for x in self.body]}
 
     def getChild(self):
         return self.body
 
 
+class AstClassDecl(AstNode):
+    type = "ClassDecl"
+    name = None
+    body = None
+
+    def __init__(self, name, body):
+        self.name = name
+        self.body = body
+
+    def __str__(self):
+        return f"{self.type}({self.name}, {self.body})"
+
+    def to_json(self):
+        return {"type": self.type, "name": self.name, "body": self.body.to_json()}
+
+    def getChild(self):
+        return [self.body]
+
+
+class AstMbrSel(AstNode):
+    type = "MbrSel"
+    object = None
+    member = None
+
+    def __init__(self, object, member):
+        self.object = object
+        self.member = member
+
+    def __str__(self):
+        return f"{self.type}({self.object}, {self.member})"
+
+    def to_json(self):
+        return {
+            "type": self.type,
+            "object": self.object.to_json(),
+            "member": self.member.to_json(),
+        }
+
+
 class AstParamsList(AstNode):
-    type = 'ParamsList'
+    type = "ParamsList"
     params = []
 
     def __init__(self, params, next=None):
@@ -80,7 +119,7 @@ class AstParamsList(AstNode):
 
 
 class AstFuncDecl(AstNode):
-    type = 'FuncDecl'
+    type = "FuncDecl"
     name = None
     params = None
     body = None
@@ -92,24 +131,24 @@ class AstFuncDecl(AstNode):
 
     def __str__(self):
         if self.params:
-            return f'{self.type}({self.name}, {[str(x) for x in self.params]}, {self.body})'
+            return f"{self.type}({self.name}, {[str(x) for x in self.params]}, {self.body})"
         else:
-            return f'{self.type}({self.name}, {self.body})'
+            return f"{self.type}({self.name}, {self.body})"
 
     def to_json(self):
         if self.params:
             return {
-                'type': self.type,
-                'name': self.name,
-                'params': [param.to_json() for param in self.params],
-                'body': self.body.to_json(),
+                "type": self.type,
+                "name": self.name,
+                "params": [param.to_json() for param in self.params],
+                "body": self.body.to_json(),
             }
         else:
             return {
-                'type': self.type,
-                'name': self.name,
-                'params': 'no params',
-                'body': self.body.to_json(),
+                "type": self.type,
+                "name": self.name,
+                "params": "no params",
+                "body": self.body.to_json(),
             }
 
     def getChild(self):
@@ -117,20 +156,20 @@ class AstFuncDecl(AstNode):
 
 
 class AstRet(AstNode):
-    type = 'Ret'
+    type = "Ret"
     expr = None
 
     def __init__(self, expr=None):
         self.expr = expr
 
     def __str__(self):
-        return f'{self.type}({self.expr})'
+        return f"{self.type}({self.expr})"
 
     def to_json(self):
         if self.expr:
-            return {'type': self.type, 'expr': self.expr.to_json()}
+            return {"type": self.type, "expr": self.expr.to_json()}
         else:
-            return {'type': self.type, 'expr': 'none'}
+            return {"type": self.type, "expr": "none"}
 
     def getChild(self):
         if self.expr:
@@ -140,7 +179,7 @@ class AstRet(AstNode):
 
 
 class AstVarDecl(AstNode):
-    type = 'VarDecl'
+    type = "VarDecl"
     varname = None
     expr = None
     varType = None
@@ -151,22 +190,22 @@ class AstVarDecl(AstNode):
         self.varType = varType
 
     def __str__(self):
-        return f'{self.type}({self.name}, {self.expr})'
+        return f"{self.type}({self.varname}, {self.expr})"
 
     def to_json(self):
         if self.varType:
             return {
-                'type': self.type,
-                'varname': self.varname,
-                'varType': self.varType,
-                'expr': self.expr.to_json(),
+                "type": self.type,
+                "varname": self.varname,
+                "varType": self.varType,
+                "expr": self.expr.to_json(),
             }
         else:
             return {
-                'type': self.type,
-                'varname': self.varname,
-                'varType': 'auto type',
-                'expr': self.expr.to_json(),
+                "type": self.type,
+                "varname": self.varname,
+                "varType": "auto type",
+                "expr": self.expr.to_json(),
             }
 
     def getChild(self):
@@ -174,7 +213,7 @@ class AstVarDecl(AstNode):
 
 
 class AstCallParamsList(AstNode):
-    type = 'CallParamsList'
+    type = "CallParamsList"
     params = []
 
     def __init__(self, params, next=None):
@@ -193,7 +232,7 @@ class AstCallParamsList(AstNode):
 
 
 class AstFuncCall(AstNode):
-    type = 'FuncCall'
+    type = "FuncCall"
     name = None
     params = []
 
@@ -207,38 +246,38 @@ class AstFuncCall(AstNode):
                 self.params = [params]
 
     def __str__(self):
-        return f'{self.type}({self.name}, {[str(x) for x in self.params]})'
+        return f"{self.type}({self.name}, {[str(x) for x in self.params]})"
 
     def to_json(self):
         if self.params:
             return {
-                'type': self.type,
-                'name': self.name,
-                'params': [x.to_json() for x in self.params],
+                "type": self.type,
+                "name": self.name,
+                "params": [x.to_json() for x in self.params],
             }
         else:
-            return {'type': self.type, 'name': self.name}
+            return {"type": self.type, "name": self.name}
 
     def getChild(self):
         return self.params
 
 
 class AstField(AstNode):
-    type = 'Field'
+    type = "Field"
     name = None
 
     def __init__(self, name):
         self.name = name
 
     def __str__(self):
-        return f'{self.type}({self.name})'
+        return f"{self.type}({self.name})"
 
     def to_json(self):
-        return {'type': self.type, 'name': self.name}
+        return {"type": self.type, "name": self.name}
 
 
 class AstIf(AstNode):
-    type = 'If'
+    type = "If"
     condition = None
     then = None
     else_ = None
@@ -249,21 +288,21 @@ class AstIf(AstNode):
         self.else_ = else_
 
     def __str__(self):
-        return f'{self.type}({self.condition}, {self.then}, {self.else_})'
+        return f"{self.type}({self.condition}, {self.then}, {self.else_})"
 
     def to_json(self):
         if self.else_:
             return {
-                'type': self.type,
-                'condition': self.condition.to_json(),
-                'then': self.then.to_json(),
-                'else': self.else_.to_json(),
+                "type": self.type,
+                "condition": self.condition.to_json(),
+                "then": self.then.to_json(),
+                "else": self.else_.to_json(),
             }
         else:
             return {
-                'type': self.type,
-                'condition': self.condition.to_json(),
-                'then': self.then.to_json(),
+                "type": self.type,
+                "condition": self.condition.to_json(),
+                "then": self.then.to_json(),
             }
 
     def getChild(self):
@@ -274,7 +313,7 @@ class AstIf(AstNode):
 
 
 class AstWhile(AstNode):
-    type = 'While'
+    type = "While"
     condition = None
     body = None
 
@@ -283,13 +322,13 @@ class AstWhile(AstNode):
         self.body = body
 
     def __str__(self):
-        return f'{self.type}({self.condition}, {self.body})'
+        return f"{self.type}({self.condition}, {self.body})"
 
     def to_json(self):
         return {
-            'type': self.type,
-            'condition': self.condition.to_json(),
-            'body': self.body.to_json(),
+            "type": self.type,
+            "condition": self.condition.to_json(),
+            "body": self.body.to_json(),
         }
 
     def getChild(self):
@@ -297,7 +336,7 @@ class AstWhile(AstNode):
 
 
 class AstAssign(AstNode):
-    type = 'Assign'
+    type = "Assign"
     lvalue = None
     expr = None
 
@@ -306,21 +345,21 @@ class AstAssign(AstNode):
         self.expr = expr
 
     def __str__(self):
-        return f'{self.type}({self.lvalue}, {self.expr})'
+        return f"{self.type}({self.lvalue}, {self.expr})"
 
     def to_json(self):
         return {
-            'type': self.type,
-            'lvalue': self.lvalue.to_json(),
-            'expr': self.expr.to_json(),
+            "type": self.type,
+            "lvalue": self.lvalue.to_json(),
+            "expr": self.expr.to_json(),
         }
 
     def getChild(self):
-        return [self.field, self.expr]
+        return [self.expr]
 
 
 class AstIndex(AstNode):
-    type = 'Index'
+    type = "Index"
     point = None
     index = None
 
@@ -329,18 +368,18 @@ class AstIndex(AstNode):
         self.index = index
 
     def __str__(self):
-        return f'{self.type}({self.point}, {self.index})'
+        return f"{self.type}({self.point}, {self.index})"
 
     def to_json(self):
         return {
-            'type': self.type,
-            'point': self.point.to_json(),
-            'index': self.index.to_json(),
+            "type": self.type,
+            "point": self.point.to_json(),
+            "index": self.index.to_json(),
         }
 
 
 class AstUnaryOper(AstNode):
-    type = 'UnaryOper'
+    type = "UnaryOper"
     operator = None
     expr = None
 
@@ -349,13 +388,13 @@ class AstUnaryOper(AstNode):
         self.expr = expr
 
     def __str__(self):
-        return f'{self.type}({self.operator}, {self.expr})'
+        return f"{self.type}({self.operator}, {self.expr})"
 
     def to_json(self):
         return {
-            'type': self.type,
-            'operator': self.operator,
-            'expr': self.expr.to_json(),
+            "type": self.type,
+            "operator": self.operator,
+            "expr": self.expr.to_json(),
         }
 
     def getChild(self):
@@ -363,7 +402,7 @@ class AstUnaryOper(AstNode):
 
 
 class AstBinaryOper(AstNode):
-    type = 'BinaryOper'
+    type = "BinaryOper"
     operator = None
     left = None
     right = None
@@ -374,14 +413,14 @@ class AstBinaryOper(AstNode):
         self.right = right
 
     def __str__(self):
-        return f'{self.type}({self.operator}, {self.left}, {self.right})'
+        return f"{self.type}({self.operator}, {self.left}, {self.right})"
 
     def to_json(self):
         return {
-            'type': self.type,
-            'operator': self.operator,
-            'left': self.left.to_json(),
-            'right': self.right.to_json(),
+            "type": self.type,
+            "operator": self.operator,
+            "left": self.left.to_json(),
+            "right": self.right.to_json(),
         }
 
     def getChild(self):
@@ -389,19 +428,19 @@ class AstBinaryOper(AstNode):
 
 
 class AstConst(AstNode):
-    type = 'Const'
+    type = "Const"
     value = None
 
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
-        return f'{self.type}({self.value})'
+        return f"{self.type}({self.value})"
 
     # to json
     def to_json(self):
-        return {'type': self.type, 'value': self.value.to_json()}
+        return {"type": self.type, "value": self.value.to_json()}
 
 
 class AstEnd(AstNode):
-    type = 'End'
+    type = "End"

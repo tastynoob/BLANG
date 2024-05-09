@@ -4,7 +4,7 @@
 # build-in types
 class TypeInt(int):
     def __add__(self, value: int):
-        return TypeInt(super().__add__(value))
+        return TypeInt(super().__add__(int(value)))
 
     def __sub__(self, value: int):
         return TypeInt(super().__sub__(value))

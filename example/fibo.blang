@@ -1,3 +1,5 @@
+
+
 def fibo(n) {
     if (n == 0) ret 0
     if (n == 1) ret 1
@@ -9,10 +11,10 @@ def waitNext() {
     input()
 }
 
-print "Enter a number: "
+# print "Enter a number: "
 # a : int = 0;
 # a = fibo int input(); 
 # a := fibo int input()
-a := 10
+a := fibo 30
 println a
 #waitNext()

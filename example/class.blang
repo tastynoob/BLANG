@@ -1,0 +1,25 @@
+class complex {
+    re := 0
+    im := 0
+    def add(c) {
+        res := complex()
+        res.re = this.re + c.re
+        res.im = this.im + c.im
+        ret res
+    }
+}
+
+a := complex()
+a.re = 2
+a.im = 3
+
+b := complex()
+b.re = 4
+b.im = 5
+
+c := a .add b
+
+print "re: "
+print c.re
+print " im: "
+println c.im
